@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f8ff;
+        text-align: center;
+        padding: 20px;
+      }
+
+      label {
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+
+      input, select {
+        margin: 5px 0;
+        padding: 10px;
+        font-size: 16px;
+        width: 200px;
+      }
+
+      button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Expense Submission Form</h2>
+    <form id="expenseForm">
+      <label for="classDate">Class Date:</label><br>
+      <select id="classDate" name="classDate"></select><br>
+
+      <label for="details">Details:</label><br>
+      <input type="text" id="details" name="details"><br>
+
+      <label for="spendAmount">Spend Amount:</label><br>
+      <input type="number" id="spendAmount" name="spendAmount"><br>
+
+      <button type="button" onclick="submitExpense()">Submit</button>
+    </form>
+
+    <script>
+      // Function to load class dates into the dropdown list
+      function setClassDates() {
+        google.script.run.withSuccessHandler(function(dates) {
+          var dropdown = document.getElementById('classDate');
+          dropdown.innerHTML = ''; // Clear existing options
+
+          // Add each date to the dropdown
+          dates.forEach(function(date) {
+            var option = document.createElement('option');
+            option.value = date;
+            option.textContent = date;
+            dropdown.appendChild(option);
+          });
+        }).getClassDates(); // Call the Apps Script function to get class dates
+      }
+
+      // Function to handle form submission
+      function submitExpense() {
+        var classDate = document.getElementById('classDate').value;
+        var details = document.getElementById('details').value;
+        var spendAmount = document.getElementById('spendAmount').value;
+
+        if (details && spendAmount && creditDebit && classDate) {
+          google.script.run.submitExpenseData(classDate, details, spendAmount);
+          alert('Expense submitted successfully!');
+          document.getElementById('expenseForm').reset(); // Reset form
+        } else {
+          alert('Please fill in all fields!');
+        }
+      }
+
+      // Call setClassDates on page load
+      window.onload = setClassDates;
+    </script>
+  </body>
+</html>

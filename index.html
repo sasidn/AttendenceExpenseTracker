@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff; /* Light blue background */
+      text-align: center;
+    }
+
+    h1 {
+      color: #1E90FF; /* Dodger blue */
+      font-size: 28px;
+    }
+
+    label {
+      font-size: 18px;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    /* Class Date Styling */
+    #classDateLabel {
+      color: #004080; /* Dark Blue */
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    /* Student Name Styling */
+    #studentNameLabel {
+      color: #008B8B; /* Teal Blue */
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    select, input[type="text"] {
+      margin-bottom: 15px;
+      padding: 12px;
+      width: 280px;
+      font-size: 18px;
+      border: 2px solid #1E90FF;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 25px;
+      background-color: #1E90FF;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #0073e6; /* Darker blue */
+    }
+
+    /* Suggestions Box */
+    .suggestions {
+      position: absolute;
+      width: 280px;
+      background: white;
+      border: 2px solid #1E90FF;
+      max-height: 150px;
+      overflow-y: auto;
+      border-radius: 5px;
+      display: none;
+      margin-top: -10px;
+      z-index: 1000;
+    }
+
+    .suggestion {
+      padding: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+      font-size: 16px;
+    }
+
+    .suggestion:hover {
+      background: #d1ecff; /* Light blue hover */
+    }
+  </style>
+</head>
+
+<body>
+  <h1>MCS Tracker</h1>
+
+  <!-- Dropdown for Class Date -->
+  <label for="classDate">Class Date:</label>
+  <select id="classDate"></select><br><br>
+
+  <!-- Input for Student Name with Suggestions -->
+  <label for="studentName">Student Name:</label>
+  <input type="text" id="studentName" onkeyup="showSuggestions()">
+  <div id="suggestions" class="suggestions"></div><br><br>
+
+  <!-- Input for Fees Collected -->
+  <label for="feesCollected">Fees Collected:</label>
+  <input type="text" id="feesCollected" placeholder="Enter fee amount"><br><br>
+
+  <!-- Submit Button -->
+  <button id="btn">Submit</button>
+
+  <script>
+    // On page load, populate the dropdowns
+    window.onload = function() {
+      google.script.run.withSuccessHandler(populateClassDateDropdown).getLatestClassDate();
+      google.script.run.withSuccessHandler(populateStudentNameDropdown).getStudentNames();
+    };
+
+    // Populate the ClassDate dropdown
+    function populateClassDateDropdown(latestDate) {
+      const classDateDropdown = document.getElementById("classDate");
+      const option = document.createElement("option");
+      option.value = latestDate;
+      option.text = latestDate;
+      classDateDropdown.appendChild(option);
+    }
+
+    let allStudentNames = [];
+
+    // Store all student names
+    function populateStudentNameDropdown(studentNames) {
+      allStudentNames = studentNames;
+    }
+
+    // Show suggestions when typing
+    function showSuggestions() {
+      const input = document.getElementById("studentName");
+      const suggestionsDiv = document.getElementById("suggestions");
+      const query = input.value.toLowerCase();
+
+      if (query.length < 1) {
+        suggestionsDiv.style.display = 'none';
+        return;
+      }
+
+      // Filter matching names
+      const filteredSuggestions = allStudentNames.filter(name => name.toLowerCase().includes(query));
+
+      suggestionsDiv.innerHTML = ""; // Clear old suggestions
+
+      if (filteredSuggestions.length > 0) {
+        suggestionsDiv.style.display = 'block';
+        filteredSuggestions.forEach(name => {
+          const div = document.createElement("div");
+          div.classList.add("suggestion");
+          div.textContent = name;
+          div.onclick = function() {
+            input.value = name;
+            suggestionsDiv.style.display = 'none';
+          };
+          suggestionsDiv.appendChild(div);
+        });
+      } else {
+        suggestionsDiv.style.display = 'none';
+      }
+    }
+
+    // Submit attendance
+    document.getElementById("btn").addEventListener("click", function() {
+      const classDate = document.getElementById("classDate").value;
+      const studentName = document.getElementById("studentName").value;
+      let feesCollected = document.getElementById("feesCollected").value;
+
+      if (!studentName.trim()) {
+        alert("Error: Student name cannot be empty!");
+        return;
+      }
+
+      // If feesCollected is empty, default it to 0
+      if (!feesCollected.trim()) {
+        feesCollected = 0;
+      }
+
+      // Make sure feesCollected is a number
+      feesCollected = parseFloat(feesCollected);
+
+      // Call the Google Apps Script function to submit the data
+      google.script.run.withSuccessHandler(function(response) {
+        alert(response); // Show success or error message
+      }).submitAttendance(classDate, studentName, feesCollected);
+    });
+  </script>
+</body>
+
+</html>
