@@ -20,4 +20,4 @@ This is a Google Apps Script project that captures student attendance for each c
 ## Technologies Used:
 - **Google Apps Script**
 - **Google Sheets**
-- **HTML, CSS, JavaScript (for web interface)
+- HTML, CSS, JavaScript (for web interface)
