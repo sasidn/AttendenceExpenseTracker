@@ -1,88 +1,188 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f8ff;
-        text-align: center;
-        padding: 20px;
-      }
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Submission Form</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7f8fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #333;
+    }
 
-      label {
-        font-size: 16px;
-        margin-bottom: 10px;
-      }
+    .form-container {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
 
-      input, select {
-        margin: 5px 0;
-        padding: 10px;
-        font-size: 16px;
-        width: 200px;
-      }
+    h1 {
+      color: #4169E1; /* Dodger blue */
+      font-size: 32px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-      button {
-        padding: 10px 20px;
-        background-color: #4CAF50;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-      }
+    h2 {
+      color: #4169E1;
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
 
-      button:hover {
-        background-color: #45a049;
-      }
-    </style>
-  </head>
-  <body>
+    label {
+      font-size: 14px;
+      margin-bottom: 5px;
+      display: block;
+      font-weight: bold;
+      color: #555;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: #4169E1;
+      outline: none;
+      box-shadow: 0 0 5px rgba(65, 105, 225, 0.5);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: #4169E1;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2c4da2;
+    }
+
+    .form-row {
+      margin-bottom: 20px;
+    }
+
+    .form-row:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h1>MCS MalayalamClass2025</h1>
     <h2>Expense Submission Form</h2>
     <form id="expenseForm">
-      <label for="classDate">Class Date:</label><br>
-      <select id="classDate" name="classDate"></select><br>
+      <!-- Class Date Dropdown -->
+      <div class="form-row">
+        <label for="classDate">Class Date:</label>
+        <select id="classDate">
+          <option value="">Select Class Date</option>
+        </select>
+      </div>
 
-      <label for="details">Details:</label><br>
-      <input type="text" id="details" name="details"><br>
+      <!-- Details Input -->
+      <div class="form-row">
+        <label for="details">Details:</label>
+        <input type="text" id="details" name="details" placeholder="Enter expense details">
+      </div>
 
-      <label for="spendAmount">Spend Amount:</label><br>
-      <input type="number" id="spendAmount" name="spendAmount"><br>
+      <!-- Spend Amount Input -->
+      <div class="form-row">
+        <label for="spendAmount">Spend Amount:</label>
+        <input type="number" id="spendAmount" name="spendAmount" placeholder="Enter amount" step="0.01" min="0" />
+      </div>
 
+      <!-- Credit/Debit Dropdown -->
+      <div class="form-row">
+        <label for="creditDebit">Credit/Debit:</label>
+        <select id="creditDebit">
+          <option value="">Select Credit or Debit</option>
+          <option value="Credit">Credit</option>
+          <option value="Debit">Debit</option>
+        </select>
+      </div>
+
+      <!-- Submit Button -->
       <button type="button" onclick="submitExpense()">Submit</button>
     </form>
+  </div>
+  <script>
+    function setClassDates() {
+      google.script.run.withSuccessHandler(function(dates) {
+        console.log("Received class dates:", dates); // Debugging line
+        var dropdown = document.getElementById('classDate');
 
-    <script>
-      // Function to load class dates into the dropdown list
-      function setClassDates() {
-        google.script.run.withSuccessHandler(function(dates) {
-          var dropdown = document.getElementById('classDate');
-          dropdown.innerHTML = ''; // Clear existing options
-
-          // Add each date to the dropdown
-          dates.forEach(function(date) {
-            var option = document.createElement('option');
-            option.value = date;
-            option.textContent = date;
-            dropdown.appendChild(option);
-          });
-        }).getClassDates(); // Call the Apps Script function to get class dates
-      }
-
-      // Function to handle form submission
-      function submitExpense() {
-        var classDate = document.getElementById('classDate').value;
-        var details = document.getElementById('details').value;
-        var spendAmount = document.getElementById('spendAmount').value;
-
-        if (details && spendAmount && creditDebit && classDate) {
-          google.script.run.submitExpenseData(classDate, details, spendAmount);
-          alert('Expense submitted successfully!');
-          document.getElementById('expenseForm').reset(); // Reset form
-        } else {
-          alert('Please fill in all fields!');
+        if (!dropdown) {
+          console.log("Dropdown element not found!");
+          return;
         }
-      }
 
-      // Call setClassDates on page load
-      window.onload = setClassDates;
-    </script>
-  </body>
+        dropdown.innerHTML = ''; // Clear existing options
+
+        if (dates.length === 0) {
+          console.log("No class dates received!");
+          return;
+        }
+
+        dates.forEach(function(date) {
+          var option = document.createElement('option');
+          option.value = date;
+          option.textContent = date;
+          dropdown.appendChild(option);
+        });
+      }).getClassDates(); // Calls the Apps Script function to fetch class dates
+    }
+
+    // Function to handle form submission
+    function submitExpense() {
+      var classDate = document.getElementById('classDate').value;
+      var details = document.getElementById('details').value;
+      var spendAmount = document.getElementById('spendAmount').value;
+      var creditDebit = document.getElementById('creditDebit').value;
+
+      // Log the values of the fields before sending them
+      console.log('Class Date:', classDate); // Check if the classDate is being correctly retrieved
+      console.log('Details:', details); // Check if the details are being correctly retrieved
+      console.log('Spend Amount:', spendAmount); // Check if the spendAmount is being correctly retrieved
+      console.log('Credit/Debit:', creditDebit); // Check if the creditDebit is being correctly retrieved
+
+      // Check if the required fields are filled
+      if (details && spendAmount && classDate && creditDebit) {
+        // Send the data to Google Apps Script for processing
+        google.script.run.submitExpenseData(classDate, details, spendAmount, creditDebit);
+        alert('Expense submitted successfully!');
+        document.getElementById('expenseForm').reset(); // Reset form after submission
+      } else {
+        alert('Please fill in all fields!');
+      }
+    }
+
+    // Call setClassDates on page load
+    window.onload = function() {
+      console.log("Loading class dates...");
+      setClassDates();
+    };
+  </script>
+</body>
 </html>
